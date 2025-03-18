@@ -1,39 +1,32 @@
 import { defineConfig } from "vite";
-import solid from "vite-plugin-solid";
+import react from "@vitejs/plugin-react";
 
+// @ts-expect-error process is a nodejs global
+const host = process.env.TAURI_DEV_HOST;
+
+// https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [solid()],
+  plugins: [react()],
 
+  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
+  //
+  // 1. prevent vite from obscuring rust errors
   clearScreen: false,
+  // 2. tauri expects a fixed port, fail if that port is not available
   server: {
     port: 1420,
     strictPort: true,
-    host: process.env.TAURI_DEV_HOST || false,
-    hmr: process.env.TAURI_DEV_HOST
+    host: host || false,
+    hmr: host
       ? {
           protocol: "ws",
-          host: process.env.TAURI_DEV_HOST,
+          host,
           port: 1421,
         }
       : undefined,
     watch: {
+      // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
-    },
-  },
-
-  build: {
-    target: "es2020",
-    minify: "terser",
-    chunkSizeWarningLimit: 1000,
-    cssCodeSplit: true,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            return "vendor";
-          }
-        },
-      },
     },
   },
 }));
