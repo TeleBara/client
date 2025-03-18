@@ -1,20 +1,40 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-body {
-  @apply bg-vscode-bg text-vscode-fg;
+:root {
+  --background: #1e1e1e;
+  --background-accent: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --accent: #007acc;
+  --border: #404040;
 }
 
-@layer components {
-  .input-base {
-    @apply w-full px-3 py-2 bg-vscode-input border border-vscode-border rounded 
-    focus:outline-none focus:border-vscode-focus focus:ring-1 focus:ring-vscode-focus;
-  }
-  
-  .btn-primary {
-    @apply px-4 py-2 bg-vscode-focus text-white rounded
-    hover:bg-opacity-90 transition-colors
-    disabled:opacity-50 disabled:cursor-not-allowed;
-  }
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.shortcut-box {
+  background-color: var(--background-accent);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 400px;
+  transition: background-color 0.2s;
+}
+
+.shortcut-box:hover {
+  background-color: #3d3d3d;
+}
+
+.kbd {
+  padding: 2px 6px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.welcome-text {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
 } 
