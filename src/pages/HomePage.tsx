@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Theme, Flex, Text, Box } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
-import { globalStore } from '../store/globalStore';
+import { globalStore } from '../store/globalStore.ts';
 import { ShortcutBox } from '../components/ShortcutBox.tsx';
 
 export function HomePage() {

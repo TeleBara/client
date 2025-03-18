@@ -9,14 +9,20 @@ interface AuthToken {
 export class AuthStore {
   private tokens: AuthToken | null = null;
   private _storageDAO: StoreDAO;
+  private _isAuthenticated: boolean = false;
 
   constructor(storageDAO: StoreDAO) {
     this._storageDAO = storageDAO;
-    this.initTokens();
+    this.init();
   }
 
-  private async initTokens() {
+  private async init() {
     this.tokens = await this._storageDAO.get<AuthToken>('tokens');
+    this._isAuthenticated = await this._storageDAO.get<boolean>('isAuthenticated') || false;
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    return this._isAuthenticated;
   }
 
   async login(email: string, password: string): Promise<boolean> {
@@ -28,6 +34,7 @@ export class AuthStore {
         refreshToken: response.refresh
       };
       await this._storageDAO.set('tokens', this.tokens);
+      this._isAuthenticated = true;
       return true;
     }
     return false;
@@ -42,7 +49,8 @@ export class AuthStore {
             refreshToken: response.refresh
         };
         await this._storageDAO.set('tokens', this.tokens);
-      return true;
+        this._isAuthenticated = true;
+        return true;
     }
     return false;
   }
@@ -51,6 +59,7 @@ export class AuthStore {
     try {
       this.tokens = null;
       await this._storageDAO.delete('tokens');
+      await this._storageDAO.delete('isAuthenticated');
       return true;
     } catch (error) {
       console.error('Failed to logout:', error);
@@ -63,6 +72,7 @@ export class AuthStore {
     
     try {
       const isValid = await authApi.verify(this.tokens.accessToken);
+      this._isAuthenticated = isValid;
       return isValid;
     } catch {
       return false;

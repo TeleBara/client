@@ -1,18 +1,18 @@
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { userStore } from '../store/userStore';
+import { globalStore } from '../store/globalStore';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await userStore.getUser();
-      setIsAuthenticated(user?.isAuthenticated || false);
+      const isAuthenticated = await globalStore.auth.isAuthenticated();
+      setIsAuthenticated(isAuthenticated);
     };
     checkAuth();
   }, []);

@@ -1,4 +1,4 @@
-import { StoreDAO } from './_storageDAO/StoreDAO';
+import { StoreDAO } from './dao/StoreDAO';
 
 export interface UserDTO {
   id: number;
@@ -13,11 +13,6 @@ export class UserStore {
 
   constructor(storageDAO: StoreDAO) {
     this._storageDAO = storageDAO;
-    this.initUserInfo();
-  }
-
-  private async initUserInfo() {
-    this.userInfo = await this._storageDAO.get<UserDTO>('userInfo');
   }
 
   async getUserDTO(): Promise<UserDTO | null> {

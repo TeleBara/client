@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { userStore } from '../store/userStore';
+import { globalStore } from '../store/globalStore';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const success = await userStore.login(email, password);
+      const success = await globalStore.auth.login(email, password);
       if (success) {
         navigate('/');
       }
