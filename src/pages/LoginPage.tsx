@@ -22,34 +22,36 @@ export function LoginPage() {
   };
 
   return (
-    <div className="bg-[#1e1e1e] min-h-screen flex items-center justify-center">
-      <form onSubmit={handleSubmit} className="w-80">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+        <h1 className="text-2xl font-medium text-center mb-6">Welcome back</h1>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
-          className="w-full mb-2 p-2 bg-[#3c3c3c] text-white"
+          className="input-base"
         />
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="w-full mb-2 p-2 bg-[#3c3c3c] text-white"
+          className="input-base"
         />
         <button 
           type="submit"
-          className="w-full p-2 bg-[#007acc] text-white"
+          disabled={isLoading}
+          className="btn-primary w-full"
         >
-          Войти
+          {isLoading ? 'Signing in...' : 'Sign in'}
         </button>
-        <div className="text-white mt-2 text-center">
+        <div className="text-center">
           <span 
             onClick={() => navigate('/register')}
-            className="cursor-pointer text-[#007acc]"
+            className="link-text"
           >
-            Регистрация
+            Create account
           </span>
         </div>
       </form>

@@ -1,67 +1,36 @@
-import { Store } from '@tauri-apps/plugin-store';
-import { authApi } from '../api/auth';
+import { StoreDAO } from './_storageDAO/StoreDAO';
 
-interface User {
+export interface UserDTO {
+  id: number;
   email: string;
-  username?: string;
-  isAuthenticated: boolean;
+  username: string;
+  created_at: Date;
 }
 
-class UserStore {
-  private store: Store | null = null;
+export class UserStore {
+  private userInfo: UserDTO | null = null;
+  private _storageDAO: StoreDAO;
 
-  private async getStore() {
-    if (!this.store) {
-      this.store = await Store.load('.settings.dat');
-    }
-    return this.store;
+  constructor(storageDAO: StoreDAO) {
+    this._storageDAO = storageDAO;
+    this.initUserInfo();
   }
 
-  async getUser(): Promise<User | null> {
-    const store = await this.getStore();
-    return await store.get('user') || null;
+  private async initUserInfo() {
+    this.userInfo = await this._storageDAO.get<UserDTO>('userInfo');
   }
 
-  private async setUser(user: User) {
-    try {
-      const store = await this.getStore();
-      await store.set('user', user);
-      await store.save();
-    } catch (error) {
-      console.error('Failed to set user:', error);
-      throw error;
-    }
+  async getUserDTO(): Promise<UserDTO | null> {
+    return this.userInfo;
   }
 
-  async login(email: string, password: string) {
-    const response = await authApi.login({ email, password });
-    if (response.success) {
-      await this.setUser(response.data);
-      return true;
-    }
-    return false;
+  async setUserInfo(userInfo: UserDTO): Promise<void> {
+    this.userInfo = userInfo;
+    await this._storageDAO.set('userInfo', userInfo);
   }
 
-  async register(email: string, password: string, username: string) {
-    const response = await authApi.register({ email, password, username });
-    if (response.success) {
-      await this.setUser(response.data);
-      return true;
-    }
-    return false;
-  }
-
-  async logout() {
-    try {
-      const store = await this.getStore();
-      await store.set('user', { isAuthenticated: false });
-      await store.save();
-      return true;
-    } catch (error) {
-      console.error('Failed to logout:', error);
-      return false;
-    }
+  async clearUserInfo(): Promise<void> {
+    this.userInfo = null;
+    await this._storageDAO.delete('userInfo');
   }
 }
-
-export const userStore = new UserStore(); 

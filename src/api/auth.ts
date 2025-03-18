@@ -7,23 +7,30 @@ interface RegisterData extends LoginData {
   username: string;
 }
 
-// Здесь будут реальные API-вызовы в будущем
+interface AuthResponseDTO {
+  access: string;
+  refresh: string;
+}
+
 export const authApi = {
-  async login({ email, password }: LoginData) {
-    // Имитация API-запроса
-    await new Promise(resolve => setTimeout(resolve, 500));
+  async login({ email, password }: LoginData): Promise<AuthResponseDTO> {
+    await new Promise<AuthResponseDTO>(resolve => setTimeout(resolve, 500));
     return { 
-      success: true, 
-      data: { email, isAuthenticated: true } 
+      access: 'asdasdas',
+      refresh: 'asdas'
     };
   },
 
-  async register({ email, password, username }: RegisterData) {
-    // Имитация API-запроса
+  async register({ email, password, username }: RegisterData): Promise<AuthResponseDTO> {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { 
-      success: true, 
-      data: { email, username, isAuthenticated: true } 
+      access: 'asdasdas',
+      refresh: 'asdas'
     };
+  },
+
+  async verify(accessToken: string): Promise<boolean> {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return true;
   }
 }; 
