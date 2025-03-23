@@ -1,5 +1,6 @@
 import { authApi } from '../api/auth';
-import { StoreDAO } from './dao/StoreDAO';
+import { userApi } from '../api/user';
+import { UserDTO } from './userStore';
 
 interface AuthToken {
   accessToken: string;
@@ -8,75 +9,78 @@ interface AuthToken {
 
 export class AuthStore {
   private tokens: AuthToken | null = null;
-  private _storageDAO: StoreDAO;
-  private _isAuthenticated: boolean = false;
+  private userData: UserDTO | null = null;
 
-  constructor(storageDAO: StoreDAO) {
-    this._storageDAO = storageDAO;
-    this.init();
+  private async refreshTokenAndUser(): Promise<boolean> {
+    if (!this.tokens?.refreshToken) return false;
+
+    try {
+      const tokens = await authApi.refresh(this.tokens.refreshToken);
+      if (!tokens) return false;
+
+      this.tokens = tokens;
+      await this.fetchAndUpdateUser();
+      return true;
+    } catch {
+      this.tokens = null;
+      this.userData = null;
+      return false;
+    }
   }
 
-  private async init() {
-    this.tokens = await this._storageDAO.get<AuthToken>('tokens');
-    this._isAuthenticated = await this._storageDAO.get<boolean>('isAuthenticated') || false;
-  }
+  private async fetchAndUpdateUser(): Promise<boolean> {
+    if (!this.tokens?.accessToken) return false;
 
-  async isAuthenticated(): Promise<boolean> {
-    return this._isAuthenticated;
+    try {
+      const userData = await userApi.getCurrentUser(this.tokens.accessToken);
+      if (!userData) return false;
+
+      this.userData = userData;
+      return true;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return this.refreshTokenAndUser();
+      }
+      return false;
+    }
   }
 
   async login(email: string, password: string): Promise<boolean> {
-    const response = await authApi.login({ email, password });
-    
-    if (response.access && response.refresh) {
-      this.tokens = {
-        accessToken: response.access,
-        refreshToken: response.refresh
-      };
-      await this._storageDAO.set('tokens', this.tokens);
-      this._isAuthenticated = true;
-      return true;
-    }
-    return false;
-  }
-
-  async register(email: string, password: string, username: string): Promise<boolean> {
-    const response = await authApi.register({ email, password, username });
-    
-    if (response.access && response.refresh) {
-        this.tokens = {
-            accessToken: response.access,
-            refreshToken: response.refresh
-        };
-        await this._storageDAO.set('tokens', this.tokens);
-        this._isAuthenticated = true;
-        return true;
-    }
-    return false;
-  }
-
-  async logout(): Promise<boolean> {
     try {
-      this.tokens = null;
-      await this._storageDAO.delete('tokens');
-      await this._storageDAO.delete('isAuthenticated');
-      return true;
-    } catch (error) {
-      console.error('Failed to logout:', error);
-      return false;
-    }
-  }
+      const tokens = await authApi.login({ email, password });
+      if (!tokens) return false;
 
-  async verify(): Promise<boolean> {
-    if (!this.tokens) return false;
-    
-    try {
-      const isValid = await authApi.verify(this.tokens.accessToken);
-      this._isAuthenticated = isValid;
-      return isValid;
+      this.tokens = tokens;
+      return this.fetchAndUpdateUser();
     } catch {
       return false;
     }
+  }
+
+  async register(email: string, password: string, username: string): Promise<boolean> {
+    try {
+      const tokens = await authApi.register({ email, password, username });
+      if (!tokens) return false;
+
+      this.tokens = tokens;
+      return this.fetchAndUpdateUser();
+    } catch {
+      return false;
+    }
+  }
+
+  async logout(): Promise<void> {
+    this.tokens = null;
+    this.userData = null;
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    if (!this.tokens || !this.userData) return false;
+    return true;
+  }
+
+  getUserData(): UserDTO | null {
+    return this.userData;
   }
 
   getAccessToken(): string | null {

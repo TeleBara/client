@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Theme, Flex, Text, Box, Card, Button } from '@radix-ui/themes';
 import * as Form from '@radix-ui/react-form';
 import '@radix-ui/themes/styles.css';
-import { globalStore } from '../store/globalStore';
+import { useState } from 'react';
+import { signUp } from "supertokens-web-js/recipe/emailpassword";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -27,24 +27,35 @@ export function RegisterPage() {
     setIsLoading(true);
     setError(null);
 
+
     try {
-      const success = await globalStore.auth.register(
-        formData.email,
-        formData.password,
-        formData.username
-      );
-      
-      if (success) {
-        navigate('/');
-      } else {
-        setError('Registration failed. Please try again.');
-      }
+      const response = await signUpClicked(formData.email, formData.password, formData.username);
+      console.log(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
   };
+
+  async function signUpClicked(email: string, password: string, username: string) {
+    return await signUp({
+        formFields: [
+          {
+            id: "email",
+            value: email
+          },
+        {
+            id: "password",
+            value: password
+        },
+        {
+            id: "username",
+            value: username
+        }
+      ]
+    })
+  }
 
   return (
     <Theme appearance="dark" grayColor="mauve" radius="large" panelBackground="translucent">

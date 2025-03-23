@@ -1,29 +1,23 @@
 import { AuthStore } from './authStore';
-import { StoreDAO } from './dao/StoreDAO';
-import { UserStore } from './userStore';
 
 class GlobalStore {
-    private _authStore: AuthStore;
-    private _userStore: UserStore;
+  private static instance: GlobalStore;
+  private _auth: AuthStore;
 
-    constructor(
-        authStore: AuthStore,
-        userStore: UserStore
-    ) {
-        this._authStore = authStore;
-        this._userStore = userStore;
-    }
-
-  get auth() {
-    return this._authStore;
+  private constructor() {
+    this._auth = new AuthStore();
   }
 
-  get user() {
-    return this._userStore;
+  public static getInstance(): GlobalStore {
+    if (!GlobalStore.instance) {
+      GlobalStore.instance = new GlobalStore();
+    }
+    return GlobalStore.instance;
+  }
+
+  get auth() {
+    return this._auth;
   }
 }
 
-export const globalStore = new GlobalStore(
-    new AuthStore(new StoreDAO()),
-    new UserStore(new StoreDAO()),
-); 
+export const globalStore = GlobalStore.getInstance(); 

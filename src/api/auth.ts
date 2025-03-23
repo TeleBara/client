@@ -7,30 +7,33 @@ interface RegisterData extends LoginData {
   username: string;
 }
 
-interface AuthResponseDTO {
-  access: string;
-  refresh: string;
+interface AuthToken {
+  accessToken: string;
+  refreshToken: string;
 }
 
 export const authApi = {
-  async login({ email, password }: LoginData): Promise<AuthResponseDTO> {
-    await new Promise<AuthResponseDTO>(resolve => setTimeout(resolve, 500));
+  async login({ email, password }: LoginData): Promise<AuthToken> {
+    await new Promise(resolve => setTimeout(resolve, 500));
     return { 
-      access: 'asdasdas',
-      refresh: 'asdas'
+      accessToken: 'mock_access_token',
+      refreshToken: 'mock_refresh_token'
     };
   },
 
-  async register({ email, password, username }: RegisterData): Promise<AuthResponseDTO> {
+  async register({ email, password, username }: RegisterData): Promise<AuthToken> {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { 
-      access: 'asdasdas',
-      refresh: 'asdas'
+      accessToken: 'mock_access_token',
+      refreshToken: 'mock_refresh_token'
     };
   },
 
-  async verify(accessToken: string): Promise<boolean> {
+  async refresh(refreshToken: string): Promise<AuthToken> {
     await new Promise(resolve => setTimeout(resolve, 500));
-    return true;
+    return { 
+      accessToken: 'new_mock_access_token',
+      refreshToken: 'new_mock_refresh_token'
+    };
   }
 }; 
