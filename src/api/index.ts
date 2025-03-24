@@ -1,3 +1,3 @@
 const apiConfig = {
-  BASE_URL: "http://localhost:6969",
+  BASE_URL: "http://localhost:7070",
 };
