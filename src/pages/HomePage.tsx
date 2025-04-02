@@ -1,8 +1,7 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX } from "react";
 import { Theme, Flex, Text, Box } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import { ShortcutBox } from "../components/ShortcutBox.tsx";
-import { useSessionContext } from "supertokens-auth-react/recipe/session/index";
 
 const shortcuts = [
   { label: "Open servers list", shortcut: "Ctrl + Tab" },
@@ -10,13 +9,6 @@ const shortcuts = [
 ];
 
 export function HomePage(): JSX.Element {
-  const session = useSessionContext();
-  const [username, setUsername] = useState<string | null>(null);
-
-  useEffect(() => {
-    console.log(session);
-  }, []);
-
   return (
     <Theme
       appearance="dark"
@@ -40,7 +32,7 @@ export function HomePage(): JSX.Element {
               marginBottom: "30px",
             }}
           >
-            Welcome, {username}!
+            Welcome, {}!
           </Text>
 
           <ShortcutBox shortcuts={shortcuts} />
